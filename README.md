@@ -1,4 +1,4 @@
-# Física y Química — IES Benimaclet
+# Física y Química — PC Santa Ana
 
 Repositorio de materiales didácticos y web de aula para las asignaturas de Física y Química (2.º ESO, 4.º ESO y 2.º Bachillerato). La web se despliega automáticamente en GitHub Pages con cada `push` a `main`.
 
