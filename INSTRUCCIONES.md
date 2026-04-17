@@ -70,19 +70,38 @@ En `data.js`, busca la sección `EVENTOS` y añade una línea nueva dentro de lo
 
 ## 3. Subir un PDF nuevo
 
-1. **Copia el archivo PDF** a la carpeta correspondiente:
-   - Apuntes → carpeta `pdfs/apuntes/`
-   - Exámenes → carpeta `pdfs/examenes/`
+Tienes dos opciones: **Google Drive** (recomendado) o **carpeta local** del repositorio.
 
-2. **Nombra el archivo** sin espacios ni acentos. Por ejemplo:
+### Opción A — Google Drive (recomendado)
+
+Ventaja: el PDF lo controlas desde Drive, no necesitas tocar el repositorio.
+
+1. Sube el PDF a la carpeta de Drive del colegio.
+2. Haz clic derecho → **Obtener enlace** → cambia el acceso a *"Cualquiera con el enlace"* (o restríngelo a `@pcsantaana.com` desde Compartir).
+3. Copia el enlace. Tendrá este formato:
+   ```
+   https://drive.google.com/file/d/IDLARGOAQUI/view?usp=sharing
+   ```
+4. En `data.js`, pega ese enlace completo en el campo `pdf`:
+   ```js
+   pdf: 'https://drive.google.com/file/d/IDLARGOAQUI/view?usp=sharing'
+   ```
+
+El botón dirá "Descargar PDF" y abrirá el visor de Drive en una nueva pestaña.
+
+### Opción B — Carpeta local del repositorio
+
+1. **Copia el PDF** a la subcarpeta según curso:
+   - `pdfs/apuntes/2eso/`, `pdfs/apuntes/4eso/` o `pdfs/apuntes/bach/`
+   - `pdfs/examenes/2eso/`, `pdfs/examenes/4eso/` o `pdfs/examenes/bach/`
+
+2. **Nombra el archivo** sin espacios ni acentos:
    - `apuntes-2eso-atomo.pdf`
    - `examen-4eso-formulacion.pdf`
 
-3. **Abre `data.js`** y encuentra la card a la que pertenece ese PDF.
-
-4. Cambia `null` por el nombre del archivo entre comillas:
+3. En `data.js`, escribe solo el nombre del archivo con la subcarpeta del curso:
    ```js
-   pdf: 'apuntes-2eso-atomo.pdf'
+   pdf: 'bach/examen-bach-trim1-2526.pdf'
    ```
 
 El botón de la card pasará automáticamente de "Próximamente" a "Descargar PDF".

@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Física & Química — Recursos de clase</title>
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -293,6 +295,52 @@
   }
   .section { animation: fadeUp .5s ease both; }
 
+  /* ── AUTH GATE ── */
+  #auth-gate {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 2rem;
+    animation: fadeUp .4s ease both;
+  }
+  #auth-gate.hidden { display: none; }
+  .auth-logo {
+    font-family: var(--mono);
+    font-size: .75rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--ink-light);
+  }
+  .auth-logo span { color: var(--accent); }
+  .auth-box {
+    border: 1px solid var(--border);
+    background: var(--white);
+    padding: 2.5rem 2rem;
+    max-width: 360px;
+    width: 90%;
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center; gap: 1.4rem;
+  }
+  .auth-box h2 {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 400;
+  }
+  .auth-box p {
+    font-size: .85rem;
+    color: var(--ink-light);
+    line-height: 1.65;
+  }
+  .auth-error {
+    font-family: var(--mono);
+    font-size: .68rem;
+    letter-spacing: .06em;
+    color: var(--accent);
+    display: none;
+  }
+  .auth-error.visible { display: block; }
+
   /* ── RESPONSIVE ── */
   @media (max-width: 640px) {
     nav { padding: 0 1.2rem; }
@@ -305,6 +353,29 @@
 </style>
 </head>
 <body>
+
+<!-- AUTH GATE -->
+<div id="auth-gate">
+  <div class="auth-logo"><span>F</span>&Q — IES Benimaclet</div>
+  <div class="auth-box">
+    <h2>Acceso de alumnos</h2>
+    <p>Inicia sesión con tu cuenta del colegio<br><strong>@pcsantaana.com</strong></p>
+    <div id="g_id_onload"
+         data-client_id="616825981078-f4p73ua5vrq7cq5vn7q71ma1oa7rmqqi.apps.googleusercontent.com"
+         data-callback="onGoogleSignIn"
+         data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-size="large"
+         data-theme="outline"
+         data-text="signin_with"
+         data-shape="rectangular"
+         data-logo_alignment="left">
+    </div>
+    <p class="auth-error" id="auth-error">Cuenta no autorizada. Usa tu correo @pcsantaana.com.</p>
+  </div>
+</div>
 
 <nav>
   <div class="nav-brand"><span>F</span>&Q — Recursos</div>
@@ -376,6 +447,35 @@
 <!-- Datos de contenido (edita data.js para cambiar cards y eventos) -->
 <script src="data.js"></script>
 <script>
+  // ── AUTH ─────────────────────────────────────────────────
+  const ALLOWED_DOMAIN = 'pcsantaana.com';
+  const CLIENT_ID      = '616825981078-f4p73ua5vrq7cq5vn7q71ma1oa7rmqqi.apps.googleusercontent.com';
+  const SESSION_KEY    = 'fq_auth';
+
+  function showSite() {
+    document.getElementById('auth-gate').classList.add('hidden');
+  }
+
+  function onGoogleSignIn(response) {
+    // Decode JWT payload (no verification needed — Google already verified)
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    const email   = payload.email || '';
+
+    if (email.endsWith('@' + ALLOWED_DOMAIN)) {
+      sessionStorage.setItem(SESSION_KEY, email);
+      showSite();
+    } else {
+      document.getElementById('auth-error').classList.add('visible');
+      // Revoke token so they can try a different account
+      google.accounts.id.revoke(payload.sub, () => {});
+    }
+  }
+
+  // Skip gate if already authenticated this session
+  if (sessionStorage.getItem(SESSION_KEY)) {
+    showSite();
+  }
+
   // ── RENDER CARDS ──────────────────────────────────────────
   function crearCard(item, carpeta) {
     const card = document.createElement('div');
@@ -384,7 +484,10 @@
 
     let enlace;
     if (item.pdf) {
-      enlace = `<a href="pdfs/${carpeta}/${item.pdf}" class="card-link" download>Descargar PDF</a>`;
+      // Soporte Drive: si empieza por https:// úsalo directo; si no, ruta local
+      const url = item.pdf.startsWith('https://') ? item.pdf : `pdfs/${carpeta}/${item.pdf}`;
+      const target = item.pdf.startsWith('https://') ? ' target="_blank"' : ' download';
+      enlace = `<a href="${url}" class="card-link"${target}>Descargar PDF</a>`;
     } else {
       enlace = `<a class="card-link disabled" aria-disabled="true">Próximamente</a>`;
     }
